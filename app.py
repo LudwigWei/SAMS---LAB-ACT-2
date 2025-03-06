@@ -84,13 +84,13 @@ def login():
 def student_dashboard():
     if "user" not in session or session["role"] != "Student":
         return redirect(url_for("login"))
-    return "<h2>Welcome Student</h2><p>Scan QR Code for Attendance</p><a href='/logout'>Logout</a>"
+    return render_template("studentDashboard.html")
 
 @app.route("/professor_dashboard")
 def professor_dashboard():
     if "user" not in session or session["role"] != "Professor":
         return redirect(url_for("login"))
-    return "<h2>Welcome Professor</h2><p>View Student Attendance</p><a href='/logout'>Logout</a>"
+    return render_template("professorDashboard.html")
 
 @app.route("/logout")
 def logout():

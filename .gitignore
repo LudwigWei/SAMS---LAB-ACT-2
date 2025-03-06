@@ -1,0 +1,5 @@
+__pycache__/
+users.db
+*.pyc
+*.pyo
+*.sqlite3

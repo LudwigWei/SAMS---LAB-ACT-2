@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>SAMS Student Dashboard</title>
-    <link rel="stylesheet" href="../assets/css/studentDashboard.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/studentDashboard.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -63,6 +63,6 @@
         </div>
     </div>
 
-    <script src="../assets/js/studentDashboard.js"></script>
+    <script src="{{ url_for('static', filename='js/studentDashboard.js') }}"></script>
 </body>
 </html>
