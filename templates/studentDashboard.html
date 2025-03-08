@@ -54,6 +54,41 @@
         <button class="upload-btn">Scan QR Code</button>
     </div>
 
+    <!-- Join Class Modal -->
+    <div class="join-class-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Join Class</h2>
+            
+            <div class="user-info-section">
+                <p class="info-label">You are currently signed in as</p>
+
+                <!--connected to db -->
+                <h3 class="user-name">{{ student_name }}</h3>
+                <p class="user-email">{{ student_email }}</p>
+            </div>
+
+            <div class="class-code-section">
+                <h4 class="section-label">CLASS CODE</h4>
+                <p class="section-description">Ask your teacher for the class code, then enter it here.</p>
+                <input type="text" class="class-code-input" placeholder="Class Code">
+            </div>
+
+            <div class="instructions">
+                <h4 class="section-label">To sign in with a class code</h4>
+                <ul class="instruction-list">
+                    <li>Use an authorized account</li><br>
+                    <li>Use a class code with 5-8 letters or numbers, and no spaces or symbols</li>
+                </ul>
+            </div>
+            
+
+            <div class="modal-actions">
+                <button class="btn-cancel">Cancel</button>
+                <button class="btn-join">Join</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Confirmation modal -->
     <div class="confirmation-modal">
         <div class="confirmation-title">Are you sure you want to log out?</div>

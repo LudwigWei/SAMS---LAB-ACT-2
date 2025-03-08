@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const logoutButton = document.querySelector('.btn-logout');
     const addButton = document.querySelector('.add-button');
     const uploadBtn = document.querySelector('.upload-btn');
+    const joinClassModal = document.querySelector('.join-class-modal');
 
     // Profile (now logout) click handler
     profileWrapper.addEventListener('click', function(e) {
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
     cancelButton.addEventListener('click', function() {
         confirmationModal.style.display = 'none';
         modalOverlay.style.display = 'none';
+        joinClassModal.style.display = 'none';
     });
 
     // Logout button click handler
@@ -36,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         modal.style.display = 'none';
         confirmationModal.style.display = 'none';
         modalOverlay.style.display = 'none';
+        joinClassModal.style.display = 'none';
     });
 
     // Course card click handler
@@ -59,7 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
         setTimeout(() => {
             this.style.transform = 'scale(1)';
         }, 100);
-        alert('Add course clicked');
+        joinClassModal.style.display = 'block';
+        modalOverlay.style.display = 'block';
     });
 
     // Upload button click handler
