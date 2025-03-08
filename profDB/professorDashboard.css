@@ -1,0 +1,475 @@
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: 'Poppins', sans-serif;
+        background-color: white;
+        overflow: hidden;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .container {
+        width: 1440px;
+        height: 900px;
+        position: relative;
+        background: white;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .circle {
+        width: 2444px;
+        height: 2444px;
+        position: absolute;
+        background: #4F5DB9;
+        border-radius: 9999px;
+    }
+
+    .circle-middle {
+        align-items: center;
+        top: -1750px;
+    }
+
+    .dashboard-card {
+        width: 635px;
+        height: 776px;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.25);
+        border-radius: 30px;
+        z-index: 1;
+    }
+
+    .card-header {
+        position: relative;
+        padding: 24px 32px;
+    }
+
+    .title {
+        color: black;
+        font-size: 40px;
+        font-weight: 600;
+        letter-spacing: 1.20px;
+        margin: 0;
+    }
+
+    .header-divider {
+        width: 570px;
+        height: 0px;
+        margin: 20px auto 0;
+        border: 1px black solid;
+    }
+
+    .add-button {
+        position: absolute;
+        right: 115px;
+        top: 30px;
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+        transition: transform 0.2s ease;
+    }
+
+    .add-button:hover {
+        transform: scale(1.1);
+    }
+
+    .profile-wrapper {
+        width: 60px;
+        height: 60px;
+        position: absolute;
+        right: 32px;
+        top: 24px;
+        background: white;
+        border-radius: 9999px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        cursor: pointer;
+        z-index: 2;
+        transition: all 0.2s ease;
+        box-shadow: 0px 0px 4px rgba(0, 0, 0, 0.25);
+    }
+
+    .profile-wrapper:hover {
+        transform: scale(1.1);
+    }
+
+    .profile-icon {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .section-title {
+        color: black;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.72px;
+        margin: 28px 0 0 21px;
+    }
+
+    .course-card {
+        width: 590px;
+        height: 109px;
+        margin: 30px 0 0 21px;
+        background: white;
+        box-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+        border-radius: 15px;
+        border: 1px black solid;
+        position: relative;
+        padding: 20px 13px;
+        box-sizing: border-box;
+        cursor: pointer;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .course-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.25);
+    }
+
+    .course-title {
+        color: black;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.72px;
+    }
+
+    .course-code {
+        color: black;
+        font-size: 16px;
+        font-weight: 400;
+        letter-spacing: 0.48px;
+        margin-top: 15px;
+    }
+
+    .course-menu {
+        position: absolute;
+        right: 13px;
+        top: 38px;
+        color: black;
+        font-size: 24px;
+        font-weight: 600;
+        letter-spacing: 0.72px;
+        transform: rotate(-90deg);
+        cursor: pointer;
+    }
+
+    .modal-overlay {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 998;
+    }
+
+    /* Modal Styling */
+.modal {
+    display: none;
+    position: fixed;
+    padding: 30px;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 635px;
+    height: 776px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+}
+
+/* Course Title */
+.modal h3 {
+    font-size: 32px;
+    font-weight: bold;
+    margin-bottom: -10px;
+}
+
+/* Course Code */
+.course-code-table {
+    font-size: 24px;
+    color: #333;
+    margin-bottom: 30px;
+}
+
+/* Horizontal Line */
+.modal hr {
+    border: none;
+    height: 1px;
+    background: #C7C7C7;
+    margin-bottom: 30px;
+}
+
+/* Table Styling */
+.table-container {
+    margin-top: 10px;
+    border: 1px solid #C7C7C7;
+    border-radius: 5px;
+    padding: 10px;
+    background: #fff;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 10px;
+    border-bottom: 1px solid #C7C7C7;
+    text-align: left;
+}
+
+th {
+    background: #f4f4f4;
+    font-weight: bold;
+}
+
+td {
+    background: #fff;
+}
+
+/* Attendance Checkbox */
+.attendance-checkbox {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    appearance: none;
+    border: 2px solid #ccc;
+    border-radius: 4px;
+    position: relative;
+}
+
+/* Checked State with Blue Check */
+.attendance-checkbox:checked {
+    background-color: #007bff;
+    border-color: #007bff;
+    position: relative;
+}
+
+.attendance-checkbox:checked::after {
+    content: '✔';
+    font-size: 14px;
+    color: white;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-weight: bold;
+}
+
+
+    .confirmation-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: white;
+        box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.25);
+        border-radius: 20px;
+        padding: 30px;
+        z-index: 1000;
+        width: 400px;
+        text-align: center;
+    }
+
+    .confirmation-title {
+        font-size: 24px;
+        font-weight: 600;
+        margin-bottom: 20px;
+    }
+
+    .confirmation-buttons {
+        display: flex;
+        justify-content: center;
+        gap: 20px;
+        margin-top: 30px;
+    }
+
+    .btn {
+        padding: 10px 30px;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: background-color 0.2s ease;
+    }
+
+    .btn-cancel {
+        background-color: #f5f5f5;
+        color: #000;
+    }
+
+    .btn-cancel:hover {
+        background-color: #e5e5e5;
+    }
+
+    .btn-logout {
+        background-color: #4F5DB9;
+        color: white;
+    }
+
+    .btn-logout:hover {
+        background-color: #3e4990;
+    }
+
+    /* Join Class Modal */
+    .add-class-modal {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 635px;
+        height: 776px;
+        background: white;
+        border-radius: 30px;
+        box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.25);
+        z-index: 1000;
+    }
+    
+    .modal-content {
+        padding: 30px;
+    }
+    
+    .modal-title {
+        font-family: 'Poppins', sans-serif;
+        font-weight: 600;
+        font-size: 32px;
+        letter-spacing: 0.96px;
+        margin-top: -10px;
+        margin-bottom: 20px;
+    }
+    
+    .class-details, .qr-section {
+        border: 1px solid #C7C7C7;
+        border-radius: 10px;
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+    
+    /* ✅ Fix: Proper label styling */
+    .add-class-modal label {
+        font-size: 16px;
+        font-weight: bold;
+        color: #000;
+        margin-bottom: 5px;
+        display: block;
+    }
+    
+    .input-field-name {
+        font-family: 'Poppins', sans-serif;
+        width: 515px;
+        height: 30px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+        margin-bottom: 30px;
+    }
+    .input-field {
+        font-family: 'Poppins', sans-serif;
+        width: 245px;
+        height: 30px;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .row {
+        display: flex;
+        gap: 10px;
+    }
+    
+    .column {
+        flex: 1;
+    }
+    
+    .qr-section {
+        background: #fff;
+        padding: 20px;
+        border: 1px solid #C7C7C7;
+        border-radius: 10px;
+        margin-bottom: 20px;
+    }
+    
+    /* ✅ Make QR container a row with proper spacing */
+    .qr-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between; /* Push elements to edges */
+        gap: 70px; /* Adjust spacing */
+    }
+    
+    /* ✅ Adjust QR title spacing */
+    .qr-section h3 {
+        margin-bottom: 15px;
+        margin-top: 0px;
+    }
+    
+    /* ✅ Style QR button */
+    .generate-btn {
+        background: #4F52B2;
+        color: white;
+        margin-top: -10px;
+        font-weight: 600;
+        padding: 12px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    /* ✅ Set QR placeholder size */
+    .qr-placeholder {
+        width: 200px;
+        height: 200px;
+        margin-top: 20px;
+        background: #D9D9D9;
+        border-radius: 4px;
+        margin-bottom: 20px;
+    }
+    
+    /* ✅ Style modal action buttons */
+    .modal-actions {
+        position: absolute;
+        bottom: 22px;
+        right: 30px;
+    }
+    
+    .cancel-btn, .create-btn {
+        font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    background-color: #FFFFFF;
+    color: #000;
+    border-radius: 10px;
+    }
+    
+    .cancel-btn:hover, 
+    .create-btn:hover {
+        background-color: #e5e5e5;
+    }

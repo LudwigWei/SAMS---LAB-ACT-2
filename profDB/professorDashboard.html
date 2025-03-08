@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TEST</title>
+    <link rel="stylesheet" href="professorDashboard.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="circle circle-middle"></div>
+
+        <!-- Main card -->
+        <div class="dashboard-card">
+            <div class="card-header">
+                <h1 class="title">Classroom</h1>
+                <div class="header-divider"></div>
+                <button class="add-button">
+                    <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M24 10V38M10 24H38" stroke="#1E1E1E" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </button>
+                <div class="profile-wrapper">
+                    <div class="profile-icon">
+                        <svg width="37" height="38" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M5 21C4.45 21 3.979 20.804 3.587 20.412C3.195 20.02 2.99934 19.5493 3 19V5C3 4.45 3.196 3.979 3.588 3.587C3.98 3.195 4.45067 2.99934 5 3H12V5H5V19H12V21H5ZM16 17L14.625 15.55L17.175 13H9V11H17.175L14.625 8.45L16 7L21 12L16 17Z" fill="#1D1B20"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">Handled Courses</div>
+
+            <div class="course-card">
+                <div class="course-title">CS 322 - SOFTWARE ENGINEERING</div>
+                <div class="course-code">CS 3201</div>
+                <div class="course-menu">...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal and overlay -->
+    <div class="modal-overlay"></div>
+    
+   <div class="modal">
+    <h3>CS 322 – SOFTWARE ENGINEERING</h3>
+    <p class="course-code-table">CS 3201</p>
+    <hr>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Student Name</th>
+                    <th>Attendance Tracker</th>
+                </tr>
+            </thead>
+            <tbody id="attendanceTableBody">
+                <!-- Student data will be inserted dynamically here -->
+            </tbody>
+        </table>
+    </div>
+</div>
+    
+
+    <!-- Add Class Modal -->
+    <div class="add-class-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Add Class</h2>
+            <div class="class-details">
+                <label for="class-name">Class Name</label>
+                <input type="text" id="class-name" class="input-field-name">
+    
+                <div class="row">
+                    <div class="column">
+                        <label for="section">Section</label>
+                        <input type="text" id="section" class="input-field">
+                    </div>
+                    <div class="column">
+                        <label for="class-code">Class Code</label>
+                        <input type="text" id="class-code" class="input-field">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="qr-section">
+                <h3>Generate QR Code</h3>
+                <div class="qr-container">
+                    <button class="generate-btn">Generate QR</button>
+                    <div class="qr-placeholder"></div>
+                </div>
+            </div>
+            
+            <div class="modal-actions">
+                <button class="cancel-btn">Cancel</button>
+                <button class="create-btn">Create</button>
+            </div>            
+        </div>
+    </div>
+    
+
+    <!-- Confirmation modal -->
+    <div class="confirmation-modal">
+        <div class="confirmation-title">Are you sure you want to log out?</div>
+        <div class="confirmation-buttons">
+            <button class="btn btn-cancel">Cancel</button>
+            <button class="btn btn-logout">Log out</button>
+        </div>
+    </div>
+
+    <script src="professorDashboard.js"></script>
+</body>
+</html>
