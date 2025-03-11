@@ -88,13 +88,14 @@ def professor_dashboard():
 @app.route("/professor/generate-qr/<classCode>", methods=["GET"])
 def get_qr_code(classCode):
     qr_path = os.path.join(QR_FOLDER, f"{classCode}.png")
-    
+
     # Generate QR Code if it doesn't exist
     if not os.path.exists(qr_path):
         qr = qrcode.make(f"http://127.0.0.1:5000/join/{classCode}")
         qr.save(qr_path)
-    
-    return jsonify({"qr_code": f"/{qr_path}"}), 200
+
+    # Return the correct URL for the QR code
+    return jsonify({"qr_code": url_for('serve_qr', filename=f"{classCode}.png", _external=True)}), 200
 
 # Serve QR Code Images
 @app.route("/static/qr_codes/<filename>")
@@ -107,4 +108,4 @@ def logout():
     return jsonify({"message": "You have been logged out."}), 200
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)
