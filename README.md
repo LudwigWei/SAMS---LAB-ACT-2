@@ -1,6 +1,5 @@
-# SAMS Lab Activity 2 Patch 2 
+# SAMS Lab Activity 2 Patch 4
   
-- **Connected backend to frontend**  
-- **Moved files** from `assets/` and `pages/` to `static/` and `templates/` to work with flask  
-- **Updated route formatting** to work with Flask  
+- **Create QR and Class functions now working**  
+- **Made changes to professorDashboard and app.py**  
 
