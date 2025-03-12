@@ -1,73 +1,43 @@
-document.addEventListener('DOMContentLoaded', function() {
-    // Get elements
-    const modal = document.querySelector('.modal');
-    const modalOverlay = document.querySelector('.modal-overlay');
-    const courseCard = document.querySelector('.course-card');
-    const courseMenu = document.querySelector('.course-menu');
-    const profileWrapper = document.querySelector('.profile-wrapper');
-    const confirmationModal = document.querySelector('.confirmation-modal');
-    const cancelButton = document.querySelector('.btn-cancel');
-    const logoutButton = document.querySelector('.btn-logout');
-    const addButton = document.querySelector('.add-button');
-    const uploadBtn = document.querySelector('.upload-btn');
-    const joinClassModal = document.querySelector('.join-class-modal');
-
-    // Profile (now logout) click handler
-    profileWrapper.addEventListener('click', function(e) {
-        e.stopPropagation();
-        confirmationModal.style.display = 'block';
-        modalOverlay.style.display = 'block';
+document.addEventListener('DOMContentLoaded', function () {
+    const qrScannerPlaceholder = document.querySelector('.qr-placeholder');
+    const scanQRButton = document.querySelector('.scan-qr-btn');
+    
+    scanQRButton.addEventListener('click', function () {
+        alert("Scanning QR Code... (Feature to be implemented)");
+        // Future implementation: Use a QR scanner library to scan codes
     });
-
-    // Cancel button click handler
-    cancelButton.addEventListener('click', function() {
-        confirmationModal.style.display = 'none';
-        modalOverlay.style.display = 'none';
-        joinClassModal.style.display = 'none';
-    });
-
-    // Logout button click handler
-    logoutButton.addEventListener('click', function() {
-        alert('Logging out...');
-        confirmationModal.style.display = 'none';
-        modalOverlay.style.display = 'none';
-    });
-
-    // Close modals when clicking overlay
-    modalOverlay.addEventListener('click', function() {
-        modal.style.display = 'none';
-        confirmationModal.style.display = 'none';
-        modalOverlay.style.display = 'none';
-        joinClassModal.style.display = 'none';
-    });
-
-    // Course card click handler
-    courseCard.addEventListener('click', function(e) {
-        if (!e.target.classList.contains('course-menu')) {
-            modal.style.display = 'block';
-            modalOverlay.style.display = 'block';
+    
+    async function fetchCourseQR(courseCode) {
+        try {
+            const response = await fetch(`/course/qr/${courseCode}`);  // Added backticks for string interpolation
+            if (response.ok) {
+                qrScannerPlaceholder.innerHTML = `<img src="/course/qr/${courseCode}" alt="QR Code" width="200" height="200">`;  // Corrected HTML string with backticks
+            } else {
+                alert("Failed to fetch QR code.");
+            }
+        } catch (error) {
+            console.error("Error fetching QR code:", error);
         }
-    });
-
-    // Course menu click handler
-    courseMenu.addEventListener('click', function(e) {
-        e.stopPropagation();
-        alert('Course menu clicked');
-    });
-
-    // Add button click handler with feedback
-    addButton.addEventListener('click', function() {
-        // Show feedback animation
-        this.style.transform = 'scale(0.9)';
-        setTimeout(() => {
-            this.style.transform = 'scale(1)';
-        }, 100);
-        joinClassModal.style.display = 'block';
-        modalOverlay.style.display = 'block';
-    });
-
-    // Upload button click handler
-    uploadBtn.addEventListener('click', function() {
-        alert('Upload QR Code clicked');
-    });
+    }
+    
+    // Automatically fetch QR code for courses assigned to the student
+    async function fetchStudentCourses(studentId) {
+        try {
+            const response = await fetch(`/student/courses/${studentId}`);  // Added backticks for string interpolation
+            const courses = await response.json();
+            if (response.ok) {
+                courses.forEach(course => {
+                    fetchCourseQR(course.code);
+                });
+            } else {
+                console.error("Failed to fetch student courses.");
+            }
+        } catch (error) {
+            console.error("Error fetching student courses:", error);
+        }
+    }
+    
+    // Example: Replace with actual student ID from session storage or login response
+    const studentId = 1; // This should be dynamically retrieved
+    fetchStudentCourses(studentId);
 });
