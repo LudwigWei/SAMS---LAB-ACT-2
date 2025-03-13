@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const modal = document.querySelector(".modal");
     const modalOverlay = document.querySelector(".modal-overlay");
-    const courseCard = document.querySelector(".course-card");
+    const courseCards = document.querySelectorAll(".course-card"); // Select all course cards
     const courseMenu = document.querySelector(".course-menu");
     const profileWrapper = document.querySelector(".profile-wrapper");
     const confirmationModal = document.querySelector(".confirmation-modal");
@@ -40,9 +40,12 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     });
 
-    // Fetch and display attendance
-    function fetchAttendance() {
-        const classCode = "CS 3201"; // Modify dynamically if needed
+    // Fetch and display attendance dynamically based on selected class
+    function fetchAttendance(classCode) {
+        if (!classCode) {
+            alert("Class code is missing.");
+            return;
+        }
 
         fetch(`/professor/attendance/${classCode}`)
             .then(response => response.json())
@@ -72,13 +75,16 @@ document.addEventListener("DOMContentLoaded", function () {
             });
     }
 
-    // Show modal and fetch attendance when course is clicked
-    courseCard.addEventListener("click", function (e) {
-        if (!e.target.classList.contains("course-menu")) {
-            modal.style.display = "block";
-            modalOverlay.style.display = "block";
-            fetchAttendance();
-        }
+    // Show modal and fetch attendance when a course card is clicked
+    courseCards.forEach(courseCard => {
+        courseCard.addEventListener("click", function (e) {
+            if (!e.target.classList.contains("course-menu")) {
+                const classCode = this.querySelector(".course-code").textContent.trim(); // Get class code dynamically
+                modal.style.display = "block";
+                modalOverlay.style.display = "block";
+                fetchAttendance(classCode);
+            }
+        });
     });
 
     // Profile (logout) click handler
