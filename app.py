@@ -25,6 +25,13 @@ class User(db.Model):
     password = db.Column(db.String(100), nullable=False)  # Hashed password
     role = db.Column(db.String(20), nullable=False)  # "Student" or "Professor"
 
+# Attendance Model
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    class_code = db.Column(db.String(20), nullable=False)
+    checked_in = db.Column(db.Boolean, default=False)
+
 # Create Database
 with app.app_context():
     db.create_all()
@@ -72,35 +79,45 @@ def login():
     else:
         return jsonify({"error": "Invalid credentials. Try again."}), 401
 
-@app.route("/student_dashboard")
-def student_dashboard():
+@app.route("/scan-qr/<classCode>", methods=["POST"])
+def scan_qr(classCode):
     if "user" not in session or session["role"] != "Student":
         return jsonify({"error": "Unauthorized access."}), 403
-    return jsonify({"message": "Welcome Student", "action": "Scan QR Code for Attendance"})
 
-@app.route("/professor_dashboard")
-def professor_dashboard():
+    user_email = session["user"]
+    student = User.query.filter_by(email=user_email).first()
+
+    if not student:
+        return jsonify({"error": "Student not found."}), 404
+
+    attendance = Attendance.query.filter_by(student_id=student.id, class_code=classCode).first()
+
+    if attendance:
+        attendance.checked_in = True
+    else:
+        attendance = Attendance(student_id=student.id, class_code=classCode, checked_in=True)
+        db.session.add(attendance)
+
+    db.session.commit()
+    return jsonify({"message": "Attendance marked successfully."}), 200
+
+@app.route("/professor/attendance/<classCode>", methods=["GET"])
+def get_attendance(classCode):
     if "user" not in session or session["role"] != "Professor":
         return jsonify({"error": "Unauthorized access."}), 403
-    return jsonify({"message": "Welcome Professor", "action": "View Student Attendance"})
 
-# Route to generate a QR Code
-@app.route("/professor/generate-qr/<classCode>", methods=["GET"])
-def get_qr_code(classCode):
-    qr_path = os.path.join(QR_FOLDER, f"{classCode}.png")
+    attendance_records = (
+        db.session.query(User.full_name, Attendance.checked_in)
+        .join(Attendance, User.id == Attendance.student_id)
+        .filter(Attendance.class_code == classCode)
+        .all()
+    )
 
-    # Generate QR Code if it doesn't exist
-    if not os.path.exists(qr_path):
-        qr = qrcode.make(f"http://127.0.0.1:5000/join/{classCode}")
-        qr.save(qr_path)
+    attendance_list = [
+        {"name": record[0], "checked": record[1]} for record in attendance_records
+    ]
 
-    # Return the correct URL for the QR code
-    return jsonify({"qr_code": url_for('serve_qr', filename=f"{classCode}.png", _external=True)}), 200
-
-# Serve QR Code Images
-@app.route("/static/qr_codes/<filename>")
-def serve_qr(filename):
-    return send_from_directory(QR_FOLDER, filename)
+    return jsonify(attendance_list), 200
 
 @app.route("/logout", methods=["POST"])
 def logout():
