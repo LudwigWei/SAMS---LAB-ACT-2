@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>TEST</title>
+    <title>Professor Dashboard</title>
     <link rel="stylesheet" href="professorDashboard.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
@@ -43,27 +43,27 @@
     <!-- Modal and overlay -->
     <div class="modal-overlay"></div>
     
-   <div class="modal">
-    <h3>CS 322 – SOFTWARE ENGINEERING</h3>
-    <p class="course-code-table">CS 3201</p>
-    <hr>
+    <!-- Attendance Modal -->
+    <div class="modal">
+        <h3>CS 322 – SOFTWARE ENGINEERING</h3>
+        <p class="course-code-table">CS 3201</p>
+        <hr>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Attendance Tracker</th>
-                </tr>
-            </thead>
-            <tbody id="attendanceTableBody">
-                <!-- Student data will be inserted dynamically here -->
-            </tbody>
-        </table>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Attendance Tracker</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <!-- Student attendance data will be inserted dynamically here -->
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
     
-
     <!-- Add Class Modal -->
     <div class="add-class-modal">
         <div class="modal-content">
@@ -99,7 +99,6 @@
         </div>
     </div>
     
-
     <!-- Confirmation modal -->
     <div class="confirmation-modal">
         <div class="confirmation-title">Are you sure you want to log out?</div>
