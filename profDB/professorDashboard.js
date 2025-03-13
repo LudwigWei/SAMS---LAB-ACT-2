@@ -14,6 +14,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const logoutButton = document.querySelector(".btn-logout");
     const addButton = document.querySelector(".add-button");
     const addClassModal = document.querySelector(".add-class-modal");
+    const attendanceTableBody = document.getElementById("attendanceTableBody");
 
     // Generate QR Code Click Handler
     generateBtn.addEventListener("click", function () {
@@ -37,6 +38,47 @@ document.addEventListener("DOMContentLoaded", function () {
                 console.error("Error:", error);
                 alert("Failed to generate QR code.");
             });
+    });
+
+    // Fetch and display attendance
+    function fetchAttendance() {
+        const classCode = "CS 3201"; // Modify dynamically if needed
+
+        fetch(`/professor/attendance/${classCode}`)
+            .then(response => response.json())
+            .then(data => {
+                attendanceTableBody.innerHTML = ""; // Clear previous data
+
+                if (data.error) {
+                    attendanceTableBody.innerHTML = `<tr><td colspan="2">${data.error}</td></tr>`;
+                    return;
+                }
+
+                data.forEach(student => {
+                    const row = document.createElement("tr");
+                    row.innerHTML = `
+                        <td>${student.name}</td>
+                        <td>
+                            <input type="checkbox" class="attendance-checkbox" ${
+                                student.checked ? "checked" : ""
+                            } disabled>
+                        </td>
+                    `;
+                    attendanceTableBody.appendChild(row);
+                });
+            })
+            .catch(error => {
+                console.error("Error fetching attendance:", error);
+            });
+    }
+
+    // Show modal and fetch attendance when course is clicked
+    courseCard.addEventListener("click", function (e) {
+        if (!e.target.classList.contains("course-menu")) {
+            modal.style.display = "block";
+            modalOverlay.style.display = "block";
+            fetchAttendance();
+        }
     });
 
     // Profile (logout) click handler
@@ -78,14 +120,6 @@ document.addEventListener("DOMContentLoaded", function () {
         confirmationModal.style.display = "none";
         modalOverlay.style.display = "none";
         addClassModal.style.display = "none";
-    });
-
-    // Course card click handler
-    courseCard.addEventListener("click", function (e) {
-        if (!e.target.classList.contains("course-menu")) {
-            modal.style.display = "block";
-            modalOverlay.style.display = "block";
-        }
     });
 
     // Course menu click handler
