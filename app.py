@@ -90,13 +90,13 @@ def scan_qr(classCode):
     if not student:
         return jsonify({"error": "Student not found."}), 404
 
-    # Ensure an attendance record exists before marking as checked-in
     attendance = Attendance.query.filter_by(student_id=student.id, class_code=classCode).first()
-    if not attendance:
+
+    if attendance:
+        attendance.checked_in = True
+    else:
         attendance = Attendance(student_id=student.id, class_code=classCode, checked_in=True)
         db.session.add(attendance)
-    else:
-        attendance.checked_in = True  # Mark as present
 
     db.session.commit()
     return jsonify({"message": "Attendance marked successfully."}), 200
