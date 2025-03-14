@@ -1,12 +1,11 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from qr_generator import generate_qr_code
+from datetime import datetime, timedelta
 import os
 
 app = Flask(__name__)
 app.secret_key = "secret_key"
-
 
 # Database Configuration (SQLite)
 BASE_DIR = os.path.abspath(os.path.dirname(__file__))
@@ -15,9 +14,12 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-## For QR generation
+# QR Code Storage
 QR_FOLDER = os.path.join(BASE_DIR, "static/qrcodes")
 os.makedirs(QR_FOLDER, exist_ok=True)
+
+# Store active QR codes (for expiration handling)
+active_qr_codes = {}
 
 # User Model
 class User(db.Model):
@@ -34,10 +36,14 @@ class Class(db.Model):
     section = db.Column(db.String(10), nullable=False)
     class_code = db.Column(db.String(10), unique=True, nullable=False)
     professor_id = db.Column(db.Integer, db.ForeignKey('user.id'), nullable=False)
-    professor = db.relationship('User', backref=db.backref('classes', lazy=True))
 
+# Attendance Model
+class Attendance(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    student_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    class_code = db.Column(db.String(20), nullable=False)
+    checked_in = db.Column(db.Boolean, default=False)
 
-# Create Database
 with app.app_context():
     db.create_all()
 
@@ -53,22 +59,19 @@ def signup():
         password = request.form["password"]
         role = request.form["role"]
 
-        # Check if user already exists
         existing_user = User.query.filter_by(email=email).first()
         if existing_user:
             flash("User already exists. Try logging in.", "error")
             return redirect(url_for("login"))
 
-        # Hash password before storing
         hashed_password = bcrypt.generate_password_hash(password).decode("utf-8")
 
-        # Add new user
         new_user = User(full_name=full_name, email=email, password=hashed_password, role=role)
         db.session.add(new_user)
         db.session.commit()
 
         flash("Account created successfully! Please log in.", "success")
-        return redirect(url_for("home"))  # Redirect to the landing page
+        return redirect(url_for("home"))
 
     return render_template("signup.html")
 
@@ -86,7 +89,6 @@ def login():
 
             flash("Login successful!", "success")
 
-            # Redirect based on role
             if user.role == "Professor":
                 return redirect(url_for("professor_dashboard"))
             elif user.role == "Student":
@@ -110,46 +112,51 @@ def professor_dashboard():
 
 @app.route("/professor/generate-qr/<class_code>")
 def generate_qr(class_code):
-    """Generates a QR code for the given class code and returns its URL."""
+    """Generates a QR code with an expiry time."""
     if "user" not in session or session["role"] != "Professor":
         return jsonify({"error": "Unauthorized"}), 403
 
-    filename = generate_qr_code(class_code)
-    qr_url = url_for("static", filename=f"qrcodes/{filename}", _external=True)
+    expiry_time = datetime.now() + timedelta(minutes=5)
+    active_qr_codes[class_code] = expiry_time
 
+    qr_url = f"http://yourwebsite.com/scan-qr/{class_code}"
     return jsonify({"qr_code": qr_url})
 
-@app.route("/professor/create-class", methods=["POST"])
-def create_class():
+@app.route("/scan-qr/<class_code>", methods=["POST"])
+def scan_qr(class_code):
+    """Marks attendance for a student."""
+    if class_code not in active_qr_codes or datetime.now() > active_qr_codes[class_code]:
+        return jsonify({"error": "QR code has expired. Ask your professor for a new one."}), 403
+
+    if "user" not in session or session["role"] != "Student":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    user_email = session["user"]
+    student = User.query.filter_by(email=user_email).first()
+
+    if not student:
+        return jsonify({"error": "Student not found."}), 404
+
+    attendance = Attendance.query.filter_by(student_id=student.id, class_code=class_code).first()
+    if not attendance:
+        attendance = Attendance(student_id=student.id, class_code=class_code, checked_in=True)
+        db.session.add(attendance)
+    else:
+        attendance.checked_in = True
+
+    db.session.commit()
+    return jsonify({"message": "Attendance marked successfully!"}), 200
+
+@app.route("/professor/attendance/<class_code>")
+def get_attendance(class_code):
     if "user" not in session or session["role"] != "Professor":
         return jsonify({"error": "Unauthorized"}), 403
 
-    # Get class details from the form
-    class_name = request.json.get("class_name")
-    section = request.json.get("section")
-    class_code = request.json.get("class_code")
+    attendance_records = db.session.query(User.full_name, Attendance.checked_in)\
+        .join(Attendance, User.id == Attendance.student_id)\
+        .filter(Attendance.class_code == class_code).all()
 
-    # Validate the data
-    if not class_name or not section or not class_code:
-        return jsonify({"error": "All fields are required."}), 400
-
-    # Check if the class code already exists
-    existing_class = Class.query.filter_by(class_code=class_code).first()
-    if existing_class:
-        return jsonify({"error": "Class with this code already exists."}), 400
-
-    # Add new class to the database
-    professor_id = User.query.filter_by(email=session["user"]).first().id
-    new_class = Class(class_name=class_name, section=section, class_code=class_code, professor_id=professor_id)
-
-    try:
-        db.session.add(new_class)
-        db.session.commit()
-        return jsonify({"success": True, "message": "Class created successfully!"}), 201
-    except Exception as e:
-        db.session.rollback()
-        return jsonify({"error": f"Error creating class: {str(e)}"}), 500
-
+    return jsonify([{"name": record[0], "checked": record[1]} for record in attendance_records])
 
 @app.route("/logout")
 def logout():
