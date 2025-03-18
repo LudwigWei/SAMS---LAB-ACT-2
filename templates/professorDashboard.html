@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -32,37 +33,37 @@
 
             <div class="section-title">Handled Courses</div>
 
-            <div class="course-card">
-                <div class="course-title">CS 322 - SOFTWARE ENGINEERING</div>
-                <div class="course-code">CS 3201</div>
-                <div class="course-menu">...</div>
+            <div class="course-container">
+                <!-- Courses will be dynamically inserted here -->
             </div>
         </div>
     </div>
 
-    <!-- Modal and overlay -->
-    <div class="modal-overlay"></div>
-    
-   <div class="modal">
-    <h3>CS 322 – SOFTWARE ENGINEERING</h3>
-    <p class="course-code-table">CS 3201</p>
-    <hr>
+   <!-- Full-Screen Attendance Modal -->
+<div class="attendance-modal-overlay" style="display: none;"></div>
 
-    <div class="table-container">
-        <table>
-            <thead>
-                <tr>
-                    <th>Student Name</th>
-                    <th>Attendance Tracker</th>
-                </tr>
-            </thead>
-            <tbody id="attendanceTableBody">
-                <!-- Student data will be inserted dynamically here -->
-            </tbody>
-        </table>
+<div class="attendance-modal" style="display: none;">
+    <div class="attendance-modal-content">
+        <h1 id="modal-course-title">Attendance</h1>
+        <p id="modal-course-code" class="course-code-table"></p>
+        <hr>
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Student Name</th>
+                        <th>Attendance Tracker</th>
+                    </tr>
+                </thead>
+                <tbody id="attendanceTableBody">
+                    <!-- Attendance data will be inserted dynamically here -->
+                </tbody>
+            </table>
+        </div>
+        <button class="close-attendance-modal">Close</button>
     </div>
 </div>
-    
+
 
     <!-- Add Class Modal -->
     <div class="add-class-modal">
@@ -71,7 +72,7 @@
             <div class="class-details">
                 <label for="class-name">Class Name</label>
                 <input type="text" id="class-name" class="input-field-name">
-    
+
                 <div class="row">
                     <div class="column">
                         <label for="section">Section</label>
@@ -83,7 +84,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="qr-section">
                 <h3>Generate QR Code</h3>
                 <div class="qr-container">
@@ -91,14 +92,13 @@
                     <div class="qr-placeholder"></div>
                 </div>
             </div>
-            
+
             <div class="modal-actions">
                 <button class="cancel-btn">Cancel</button>
                 <button class="create-btn">Create</button>
-            </div>            
+            </div>
         </div>
     </div>
-    
 
     <!-- Confirmation modal -->
     <div class="confirmation-modal">
@@ -109,6 +109,6 @@
         </div>
     </div>
 
-    <script src="{{ url_for('static', filename='js/professorDashboard.js') }}"></script> 
+    <script src="{{ url_for('static', filename='js/professorDashboard.js') }}"></script>
 </body>
 </html>

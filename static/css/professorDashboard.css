@@ -116,7 +116,7 @@ body {
     margin: 28px 0 0 21px;
 }
 
-.course-card {
+.course-button {
     width: 590px;
     height: 109px;
     margin: 30px 0 0 21px;
@@ -131,7 +131,7 @@ body {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.course-card:hover {
+.course-button:hover {
     transform: translateY(-2px);
     box-shadow: 0px 6px 8px rgba(0, 0, 0, 0.25);
 }
@@ -173,6 +173,54 @@ body {
     background: rgba(0, 0, 0, 0.5);
     z-index: 998;
 }
+
+.attendance-modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5); /* Dark overlay */
+    z-index: 1000;
+}
+
+.attendance-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* Centering */
+    width: 600px;
+    max-width: 90%;
+    background: white;
+    padding: 20px;
+    border-radius: 20px;
+    z-index: 1001;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.attendance-modal-content {
+    text-align: center;
+    padding: 20px;
+}
+
+.close-attendance-modal {
+    display: block;
+    margin: 20px auto;
+    padding: 10px 20px;
+    border: none;
+    background: red;
+    color: white;
+    font-size: 16px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.close-attendance-modal:hover {
+    background: darkred;
+}
+
 
 /* Modal Styling */
 .modal {
@@ -450,7 +498,7 @@ font-weight: bold;
     margin-bottom: 20px;
 }
 
-/* ✅ Style modal action buttons */
+/* Style modal action buttons */
 .modal-actions {
     position: absolute;
     bottom: 22px;

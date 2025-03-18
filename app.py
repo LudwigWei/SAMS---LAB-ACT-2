@@ -2,6 +2,9 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from datetime import datetime, timedelta
+import io
+import base64
+import qrcode
 import os
 
 app = Flask(__name__)
@@ -14,12 +17,10 @@ app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-# QR Code Storage
-QR_FOLDER = os.path.join(BASE_DIR, "static/qrcodes")
-os.makedirs(QR_FOLDER, exist_ok=True)
-
 # Store active QR codes (for expiration handling)
 active_qr_codes = {}
+QR_FOLDER = os.path.join(BASE_DIR, "qrcodes")
+os.makedirs(QR_FOLDER, exist_ok=True)
 
 # User Model
 class User(db.Model):
@@ -98,11 +99,6 @@ def login():
 
     return render_template("index.html")
 
-@app.route("/studentDashboard")
-def student_dashboard():
-    if "user" not in session or session["role"] != "Student":
-        return redirect(url_for("login"))
-    return render_template("studentDashboard.html")
 
 @app.route("/professorDashboard")
 def professor_dashboard():
@@ -112,51 +108,188 @@ def professor_dashboard():
 
 @app.route("/professor/generate-qr/<class_code>")
 def generate_qr(class_code):
-    """Generates a QR code with an expiry time."""
+    """Generates a QR code, saves it locally, and returns a Base64 string."""
     if "user" not in session or session["role"] != "Professor":
         return jsonify({"error": "Unauthorized"}), 403
 
     expiry_time = datetime.now() + timedelta(minutes=5)
     active_qr_codes[class_code] = expiry_time
 
-    qr_url = f"http://yourwebsite.com/scan-qr/{class_code}"
-    return jsonify({"qr_code": qr_url})
+    qr = qrcode.QRCode(
+        version=1,
+        box_size=10,
+        border=5
+    )
+    qr.add_data(f"http://yourwebsite.com/scan-qr/{class_code}")
+    qr.make(fit=True)
 
-@app.route("/scan-qr/<class_code>", methods=["POST"])
-def scan_qr(class_code):
-    """Marks attendance for a student."""
-    if class_code not in active_qr_codes or datetime.now() > active_qr_codes[class_code]:
-        return jsonify({"error": "QR code has expired. Ask your professor for a new one."}), 403
+    img = qr.make_image(fill="black", back_color="white")
+    qr_path = os.path.join(QR_FOLDER, f"{class_code}.png")
+    img.save(qr_path)
 
-    if "user" not in session or session["role"] != "Student":
-        return jsonify({"error": "Unauthorized"}), 403
+    with open(qr_path, "rb") as qr_file:
+        qr_base64 = base64.b64encode(qr_file.read()).decode("utf-8")
 
-    user_email = session["user"]
-    student = User.query.filter_by(email=user_email).first()
+    return jsonify({"qr_code": f"data:image/png;base64,{qr_base64}", "qr_path": qr_path})
 
-    if not student:
-        return jsonify({"error": "Student not found."}), 404
-
-    attendance = Attendance.query.filter_by(student_id=student.id, class_code=class_code).first()
-    if not attendance:
-        attendance = Attendance(student_id=student.id, class_code=class_code, checked_in=True)
-        db.session.add(attendance)
-    else:
-        attendance.checked_in = True
-
-    db.session.commit()
-    return jsonify({"message": "Attendance marked successfully!"}), 200
-
-@app.route("/professor/attendance/<class_code>")
-def get_attendance(class_code):
+@app.route("/professor/create-class", methods=["POST"])
+def create_class():
+    """Allows professors to create a new class."""
     if "user" not in session or session["role"] != "Professor":
         return jsonify({"error": "Unauthorized"}), 403
 
-    attendance_records = db.session.query(User.full_name, Attendance.checked_in)\
-        .join(Attendance, User.id == Attendance.student_id)\
-        .filter(Attendance.class_code == class_code).all()
+    data = request.get_json()
+    class_name = data.get("class_name")
+    section = data.get("section")
+    class_code = data.get("class_code")
 
-    return jsonify([{"name": record[0], "checked": record[1]} for record in attendance_records])
+    if not class_name or not section or not class_code:
+        return jsonify({"error": "All fields are required."}), 400
+
+    existing_class = Class.query.filter_by(class_code=class_code).first()
+    if existing_class:
+        return jsonify({"error": "Class with this code already exists."}), 400
+
+    professor = User.query.filter_by(email=session["user"]).first()
+    if not professor:
+        return jsonify({"error": "Professor not found."}), 404
+
+    new_class = Class(class_name=class_name, section=section, class_code=class_code, professor_id=professor.id)
+
+    try:
+        db.session.add(new_class)
+        db.session.commit()
+        return jsonify({"success": True, "message": "Class created successfully!"}), 201
+    except Exception as e:
+        db.session.rollback()
+        return jsonify({"error": f"Database error: {str(e)}"}), 500
+
+@app.route("/professor/classes")
+def get_classes():
+    """Fetches all classes handled by the logged in professor"""
+    if "user" not in session or session["role"] != "Professor":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    professor = User.query.filter_by(email=session["user"]).first()
+    if not professor:
+        return jsonify({"error": "Professor not found."}), 404
+
+    classes = Class.query.filter_by(professor_id=professor.id).all()
+
+    return jsonify({"classes": [
+        {"class_name": c.class_name, "section": c.section, "class_code": c.class_code}
+        for c in classes
+    ]}), 200
+
+@app.route("/professor/attendance-data/<class_code>")
+def get_attendance(class_code):
+    """Fetches attendance records for a specific class"""
+    if "user" not in session or session["role"] != "Professor":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    attendance_records = (
+        db.session.query(User.full_name, Attendance.checked_in)
+        .join(Attendance, User.id == Attendance.student_id, isouter=True)
+        .filter(Attendance.class_code == class_code)
+        .all()
+    )
+
+    attendance_list = [{"name": record[0], "checked": record[1] if record[1] is not None else False} for record in attendance_records]
+
+    return jsonify(attendance_list), 200
+
+@app.route("/studentDashboard")
+def student_dashboard():
+    if "user" not in session or session["role"] != "Student":
+        return redirect(url_for("login"))
+    
+    student = User.query.filter_by(email=session["user"]).first()
+    
+    # Fetch all classes the student has joined
+    enrolled_classes = (
+        db.session.query(Class.class_name, Class.section, Class.class_code)
+        .join(Attendance, Attendance.class_code == Class.class_code)
+        .filter(Attendance.student_id == student.id)
+        .all()
+    )
+
+    return render_template("studentDashboard.html", enrolled_classes=enrolled_classes)
+
+@app.route("/student/join-class", methods=["POST"])
+def join_class():
+    if "user" not in session or session["role"] != "Student":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.json
+    class_code = data.get("class_code")
+
+    if not class_code:
+        return jsonify({"error": "Class code is required."}), 400
+
+    class_obj = Class.query.filter_by(class_code=class_code).first()
+    if not class_obj:
+        return jsonify({"error": "Invalid class code."}), 400
+
+    student_email = session["user"]
+    student = User.query.filter_by(email=student_email).first()
+
+    # Check if already enrolled
+    existing_attendance = Attendance.query.filter_by(student_id=student.id, class_code=class_code).first()
+    if existing_attendance:
+        return jsonify({"error": "Already enrolled in this class."}), 400
+
+    # Create a new attendance record
+    new_attendance = Attendance(student_id=student.id, class_code=class_code, checked_in=False)
+    db.session.add(new_attendance)
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Successfully joined class!"}), 200
+
+
+@app.route("/student/mark-attendance", methods=["POST"])
+def mark_attendance():
+    if "user" not in session or session["role"] != "Student":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    data = request.json
+    class_code = data.get("class_code")
+
+    if not class_code:
+        return jsonify({"error": "Class code is required."}), 400
+
+    class_obj = Class.query.filter_by(class_code=class_code).first()
+    if not class_obj:
+        return jsonify({"error": "Invalid class code."}), 400
+
+    student_email = session["user"]
+    student = User.query.filter_by(email=student_email).first()
+
+    # Check if the student is enrolled in the class
+    attendance_record = Attendance.query.filter_by(student_id=student.id, class_code=class_code).first()
+    if not attendance_record:
+        return jsonify({"error": "You are not enrolled in this class."}), 400
+
+    # Mark attendance
+    attendance_record.checked_in = True
+    db.session.commit()
+
+    return jsonify({"success": True, "message": "Attendance marked successfully!"}), 200
+
+@app.route("/student/get-qr/<class_code>")
+def get_qr_for_student(class_code):
+    """Allows students to fetch the QR code for a class."""
+    if "user" not in session or session["role"] != "Student":
+        return jsonify({"error": "Unauthorized"}), 403
+
+    qr_path = os.path.join(QR_FOLDER, f"{class_code}.png")
+    if not os.path.exists(qr_path):
+        return jsonify({"error": "QR code not found."}), 404
+
+    with open(qr_path, "rb") as qr_file:
+        qr_base64 = base64.b64encode(qr_file.read()).decode("utf-8")
+
+    return jsonify({"qr_code": f"data:image/png;base64,{qr_base64}"})
+
 
 @app.route("/logout")
 def logout():
