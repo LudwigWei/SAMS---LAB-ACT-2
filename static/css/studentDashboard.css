@@ -104,8 +104,7 @@ body {
 }
 
 .profile-wrapper:hover {
-    box-shadow: 0px 0px 8px rgba(0, 0, 0, 0.3);
-    transform: translateY(-2px);
+    transform: scale(1.1);
 }
 
 .profile-icon {
@@ -230,7 +229,6 @@ body {
 
 .upload-btn:hover {
     background: #404b94;
-    transform: translateY(-2px);
 }
 
 .upload-btn:active {
@@ -285,10 +283,116 @@ body {
 }
 
 .btn-logout {
-    background-color: #FF0000;
+    background-color: #4F5DB9;
     color: white;
 }
 
 .btn-logout:hover {
-    background-color: #d40000;
+    background-color: #3e4990;
+}
+
+/* Join Class Modal */
+.join-class-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 635px;
+    height: 776px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0px 0px 4px 3px rgba(0, 0, 0, 0.25);
+    z-index: 1000;
+}
+
+.modal-content {
+    padding: 30px;
+}
+
+.modal-title {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    font-size: 32px;
+    letter-spacing: 0.96px;
+    margin-top: -10px;
+    margin-bottom: 20px;
+}
+
+.user-info-section, .class-code-section {
+    border: 1px solid #C7C7C7;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.info-label {
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.user-name {
+    text-transform: uppercase;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: -10px;
+}
+
+.user-email {
+    font-size: 16px;
+    color: #000;
+}
+
+.section-label {
+    font-weight: 900;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.section-description {
+    margin-bottom: 20px;
+}
+
+.class-code-input {
+    width: 256px;
+    height: 46px;
+    border: 1px solid #7B7B7B;
+    border-radius: 5px;
+    padding: 0 15px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    margin-bottom: 25px;
+}
+
+.instructions {
+    margin-top: 40px;
+}
+
+.code-rules {
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.modal-actions {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+}
+
+.btn-cancel,
+.btn-join {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-size: 16px;
+    padding: 10px 20px;
+    border: none;
+    cursor: pointer;
+    background-color: #FFFFFF;
+    color: #000;
+    border-radius: 10px;
+}
+
+.btn-cancel:hover,
+.btn-join:hover {
+    background-color: #e5e5e5;
 }

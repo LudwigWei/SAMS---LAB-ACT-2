@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>SAMS Student Dashboard</title>
-    <link rel="stylesheet" href="../assets/css/studentDashboard.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/studentDashboard.css') }}">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
 </head>
 <body>
@@ -33,11 +33,13 @@
 
             <div class="section-title">Enrollled Courses</div>
 
+            {% for class in enrolled_classes %}
             <div class="course-card">
-                <div class="course-title">CS 322 - SOFTWARE ENGINEERING</div>
-                <div class="course-code">CS 3201</div>
+                <div class="course-title">{{ class.class_name }}</div>
+                <div class="course-code">{{ class.class_code }}</div>
                 <div class="course-menu">...</div>
             </div>
+            {% endfor %}
         </div>
     </div>
 
@@ -47,11 +49,44 @@
     <!-- QR Code Modal -->
     <div class="modal">
         <div class="qr-placeholder">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-            </svg>
+            <img id="qr-image" src="" alt="QR Code" width="200" height="200">
         </div>
         <button class="upload-btn">Scan QR Code</button>
+    </div>
+
+    <!-- Join Class Modal -->
+    <div class="join-class-modal">
+        <div class="modal-content">
+            <h2 class="modal-title">Join Class</h2>
+            
+            <div class="user-info-section">
+                <p class="info-label">You are currently signed in as</p>
+
+                <!--connected to db -->
+                <h3 class="user-name">{{ student_name }}</h3>
+                <p class="user-email">{{ student_email }}</p>
+            </div>
+
+            <div class="class-code-section">
+                <h4 class="section-label">CLASS CODE</h4>
+                <p class="section-description">Ask your teacher for the class code, then enter it here.</p>
+                <input type="text" class="class-code-input" placeholder="Class Code">
+            </div>
+
+            <div class="instructions">
+                <h4 class="section-label">To sign in with a class code</h4>
+                <ul class="instruction-list">
+                    <li>Use an authorized account</li><br>
+                    <li>Use a class code with 5-8 letters or numbers, and no spaces or symbols</li>
+                </ul>
+            </div>
+            
+
+            <div class="modal-actions">
+                <button class="btn-cancel">Cancel</button>
+                <button class="btn-join">Join</button>
+            </div>
+        </div>
     </div>
 
     <!-- Confirmation modal -->
@@ -63,6 +98,6 @@
         </div>
     </div>
 
-    <script src="../assets/js/studentDashboard.js"></script>
+    <script src="{{ url_for('static', filename='js/studentDashboard.js') }}"></script>
 </body>
 </html>
